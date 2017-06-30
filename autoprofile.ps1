@@ -1,16 +1,22 @@
 #Install VsCode and Powershell extension
-if (-not (Test-Path "C:\Program Files (x86)\Microsoft VS Code")) {
-    Install-Script Install-VSCode -Scope CurrentUser; Install-VSCode.ps1
-}
+Install-Script Install-VSCode -Scope CurrentUser; Install-VSCode.ps1 -AdditionalExtensions eamodio.gitlens
 
-# Check that modules are installed
-if ((Get-Module -ListAvailable pester) -eq $null) {
-    Install-Module pester -Scope CurrentUser
-} elseif ((Get-Module -ListAvailable posh-git) -eq $null) {
-    Install-Module posh-git -Scope CurrentUser
-} elseif ((Get-Module -ListAvailable plaster) -eq $null) {
-    Install-Module plaster -Scope CurrentUser
-}
+#Install git
+Install-Script Install-Git -Scope CurrentUser; Install-Git.ps1
+
+#Reload Path
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
+
+#Set Git variables
+git config --global user.name "Tom-Inge Larsen"
+git config --global user.email "tom-inge.larsen@advania.no"
+git config --global push.default "simple"
+
+# Install modules
+Install-Module pester -Scope CurrentUser
+Install-Module posh-git -Scope CurrentUser
+Install-Module plaster -Scope CurrentUser
+
 
 $profilecontent = "
 Push-Location (Split-Path -Path `$MyInvocation.MyCommand.Definition -Parent)
@@ -50,7 +56,7 @@ Pop-Location
 
 Start-SshAgent -Quiet
 
-invoke-pester -path (join-path -path (split-path `$profile) -childpath test)
+Invoke-Pester -Path (Join-Path -Path (Split-Path `$profile) -Childpath test)
 
 DefaultPrompt
 "
