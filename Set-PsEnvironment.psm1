@@ -88,7 +88,7 @@ function New-PsEnvironmentConfig {
     i.e a GitHub gist, or on an SMB fileshare.
 
     .EXAMPLE
-    New-PsEnvironmentConfig -OutputFilePath c:\temp -InstallGit -GitUserName "Your Name" -GitEmail "your@email.com" -InstallVscode -AdditionalVsCodeExtensions 'eamodio.gitlens', 'vscodevim.vim' -PsModules 'pester','plaster' -PsProfile c:\path\to\source\profile.ps1 -IncludeTests
+    New-PsEnvironmentConfig -OutputFilePath c:\temp\config.json -InstallGit -GitUserName "Your Name" -GitEmail "your@email.com" -InstallVscode -AdditionalVsCodeExtensions 'eamodio.gitlens', 'vscodevim.vim' -PsModules 'pester','plaster' -PsProfile c:\path\to\source\profile.ps1 -IncludeTests
 
     Will generate a json file containing all parameters needed to run Set-PsEnvironment -Config c:\path\to\config.json
 
