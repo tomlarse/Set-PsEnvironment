@@ -14,22 +14,22 @@ function Set-PsEnvironment {
     Will set up an environment based on the parameters.
 
     .EXAMPLE
-    Set-PsEnvironment -Config c:\path\to\config.json
+    Set-PsEnvironment -ConfigFile c:\path\to\config.json
 
     Will set up an environment based on the parameters in the given file in the path specified
 
     .EXAMPLE
-    Set-PsEnvironment -Config (iwr http://gist.github.com/username/gistid/raw)
+    Set-PsEnvironment -ConfigFile (iwr http://gist.github.com/username/gistid/raw)
 
     Will set up an environment based on the parameters in the given file in the url specified
 
     .EXAMPLE
-    Set-PsEnvironment -Config c:\path\to\config.json -Update
+    Set-PsEnvironment -ConfigFile c:\path\to\config.json -Update
 
     Will update the environment based on the parameters in the given file in the path specified
 
-    .PARAMETER OutputFilePath
-    Path to export the resulting json file
+    .PARAMETER ConfigFile
+    Path to a json file containing the config
 
     .PARAMETER InstallGit
     Include this if git should be installed
@@ -62,9 +62,26 @@ function Set-PsEnvironment {
     .NOTES
     General notes
     #>
-    [CmdletBinding()]
-    param (
-
+    [CmdletBinding(DefaultParameterSetName="Manual")]
+    Param (
+        [parameter(ParameterSetName="Config",Mandatory=$true)]
+        [string]ConfigFile
+        [parameter(ParameterSetName="Manual",Mandatory=$true)]
+        [string]PsProfile,
+        [parameter(ParameterSetName="Manual",Mandatory=$false)]
+        [switch]InstallGit,
+        [parameter(ParameterSetName="Manual",Mandatory=$false)]
+        [string]GitUserName,
+        [parameter(ParameterSetName="Manual",Mandatory=$false)]
+        [string]GitEmail,
+        [parameter(ParameterSetName="Manual",Mandatory=$false)]
+        [switch]InstallVscode,
+        [parameter(ParameterSetName="Manual",Mandatory=$false)]
+        [string[]]AdditionalVsCodeExtensions,
+        [parameter(ParameterSetName="Manual",Mandatory=$false)]
+        [string[]]PsModules,
+        [parameter(ParameterSetName="Manual",Mandatory=$false)]
+        [switch]IncludeTests
     )
 
     begin {
@@ -125,8 +142,25 @@ function New-PsEnvironmentConfig {
 
     #>
     [CmdletBinding()]
-    param (
-
+    Param (
+        [parameter(Mandatory=$true)]
+        [string]OutputFilePath,
+        [parameter(Mandatory=$true)]
+        [string]PsProfile,
+        [parameter(Mandatory=$false)]
+        [switch]InstallGit,
+        [parameter(Mandatory=$false)]
+        [string]GitUserName,
+        [parameter(Mandatory=$false)]
+        [string]GitEmail,
+        [parameter(Mandatory=$false)]
+        [switch]InstallVscode,
+        [parameter(Mandatory=$false)]
+        [string[]]AdditionalVsCodeExtensions,
+        [parameter(Mandatory=$false)]
+        [string[]]PsModules,
+        [parameter(Mandatory=$false)]
+        [switch]IncludeTests
     )
 
     begin {
