@@ -177,7 +177,7 @@ function New-PsEnvironmentConfig {
         $config.GitEmail = $GitEmail
         $config.GitUserName = $GitUserName
         $config.PsModules = $PsModules
-        $config.PsProfile = $PsProfile
+        $config.PsProfile = Get-Content -Path $PsProfile
 
         If ($InstallGit) {
             $config.InstallGit = $true
