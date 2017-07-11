@@ -65,7 +65,7 @@ function Set-PsEnvironment {
     [CmdletBinding(DefaultParameterSetName="Manual")]
     Param (
         [parameter(ParameterSetName="Config",Mandatory=$true)]
-        [string]ConfigFile
+        [string]ConfigFile,
         [parameter(ParameterSetName="Manual",Mandatory=$true)]
         [string]PsProfile,
         [parameter(ParameterSetName="Manual",Mandatory=$false)]
