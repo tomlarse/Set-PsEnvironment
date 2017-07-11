@@ -14,22 +14,27 @@ function Set-PsEnvironment {
     Will set up an environment based on the parameters.
 
     .EXAMPLE
-    Set-PsEnvironment -ConfigFile c:\path\to\config.json
+    Set-PsEnvironment -Config (New-PsEnvironmentConfig -InstallGit -GitUserName "Your Name" -GitEmail "your@email.com" -InstallVscode -AdditionalVsCodeExtensions 'eamodio.gitlens', 'vscodevim.vim' -PsModules 'pester','plaster' -PsProfile c:\path\to\source\profile.ps1 -IncludeTests)
 
-    Will set up an environment based on the parameters in the given file in the path specified
+    Will set up an environment based on the parameters in the given config
 
     .EXAMPLE
-    Set-PsEnvironment -ConfigFile (iwr http://gist.github.com/username/gistid/raw)
+    New-PsEnvironmentConfig -InstallGit -GitUserName "Your Name" -GitEmail "your@email.com" -InstallVscode -AdditionalVsCodeExtensions 'eamodio.gitlens', 'vscodevim.vim' -PsModules 'pester','plaster' -PsProfile c:\path\to\source\profile.ps1 -IncludeTests | Set-PsEnvironment
+
+    Will set up an environment based on the parameters in the given config
+
+    .EXAMPLE
+    Set-PsEnvironment -Config (iwr http://gist.github.com/username/gistid/raw | ConvertFrom-Json)
 
     Will set up an environment based on the parameters in the given file in the url specified
 
     .EXAMPLE
-    Set-PsEnvironment -ConfigFile c:\path\to\config.json -Update
+    Set-PsEnvironment -Config $config -Update
 
-    Will update the environment based on the parameters in the given file in the path specified
+    Will update the environment based on the parameters in the given config
 
-    .PARAMETER ConfigFile
-    Path to a json file containing the config
+    .PARAMETER Config
+    A config generated from New-PsEnvironmentConfig
 
     .PARAMETER InstallGit
     Include this if git should be installed
@@ -64,8 +69,8 @@ function Set-PsEnvironment {
     #>
     [CmdletBinding(DefaultParameterSetName="Manual")]
     Param (
-        [parameter(ParameterSetName="Config",Mandatory=$true)]
-        [string]$ConfigFile,
+        [parameter(ParameterSetName="Config",Mandatory=$true,ValueFromPipeline=$true)]
+        [PsEnvironmentConfig]$Config,
         [parameter(ParameterSetName="Manual",Mandatory=$true)]
         [string]$PsProfile,
         [parameter(ParameterSetName="Manual",Mandatory=$false)]
@@ -97,20 +102,22 @@ function Set-PsEnvironment {
 function New-PsEnvironmentConfig {
     <#
     .SYNOPSIS
-    Creates a config file for use with Set-PsEnvironment
+    Creates a config for use with Set-PsEnvironment
 
     .DESCRIPTION
-    Takes the same input as Set-PsEnvironment, but instead of running it it will create a json config file that can be used to
-    make Set-PsEnvironment behave the same each time it is run. The file can be hosted anywhere it can be retrieved as a text string
-    i.e a GitHub gist, or on an SMB fileshare.
+    Takes the same input as Set-PsEnvironment, but instead of running it it will create config that can be used to
+    make Set-PsEnvironment behave the same each time it is run. The config can be hosted anywhere it can be
+    retrieved as a powershell object or exported/imported as text string i.e a GitHub gist, or on an SMB fileshare.
 
     .EXAMPLE
-    New-PsEnvironmentConfig -OutputFilePath c:\temp\config.json -InstallGit -GitUserName "Your Name" -GitEmail "your@email.com" -InstallVscode -AdditionalVsCodeExtensions 'eamodio.gitlens', 'vscodevim.vim' -PsModules 'pester','plaster' -PsProfile c:\path\to\source\profile.ps1 -IncludeTests
+    New-PsEnvironmentConfig -InstallGit -GitUserName "Your Name" -GitEmail "your@email.com" -InstallVscode -AdditionalVsCodeExtensions 'eamodio.gitlens', 'vscodevim.vim' -PsModules 'pester','plaster' -PsProfile c:\path\to\source\profile.ps1 -IncludeTests
 
-    Will generate a json file containing all parameters needed to run Set-PsEnvironment -Config c:\path\to\config.json
+    Will generate a config containing all parameters needed to run Set-PsEnvironment, and can be piped into Set-PsEnvironment.
 
-    .PARAMETER OutputFilePath
-    Path to export the resulting json file
+    .EXAMPLE
+    New-PsEnvironmentConfig -InstallGit -GitUserName "Your Name" -GitEmail "your@email.com" -InstallVscode -AdditionalVsCodeExtensions 'eamodio.gitlens', 'vscodevim.vim' -PsModules 'pester','plaster' -PsProfile c:\path\to\source\profile.ps1 -IncludeTests | Convertto-Json
+
+    Will export the config to json
 
     .PARAMETER InstallGit
     Include this if git should be installed
@@ -144,8 +151,6 @@ function New-PsEnvironmentConfig {
     [CmdletBinding()]
     Param (
         [parameter(Mandatory=$true)]
-        [string]$OutputFilePath,
-        [parameter(Mandatory=$true)]
         [string]$PsProfile,
         [parameter(Mandatory=$false)]
         [switch]$InstallGit,
@@ -164,13 +169,50 @@ function New-PsEnvironmentConfig {
     )
 
     begin {
+        $config = [PsEnvironmentConfig]::new()
     }
 
     process {
+        $config.AdditionalVsCodeExtensions = $AdditionalVsCodeExtensions
+        $config.GitEmail = $GitEmail
+        $config.GitUserName = $GitUserName
+        $config.PsModules = $PsModules
+        $config.PsProfile = $PsProfile
+
+        If ($InstallGit) {
+            $config.InstallGit = $true
+        } else {
+            $config.InstallGit = $false
+        }
+
+        if ($InstallVscode) {
+            $config.InstallVscode = $true
+        } else {
+            $config.InstallVscode = $false
+        }
+
+        if ($IncludeTests) {
+            $config.IncludeTests = $true
+        } else {
+            $config.IncludeTests = $false
+        }
     }
 
     end {
+        $config
     }
+}
+
+#Config class
+class PsEnvironmentConfig {
+        [string]$PsProfile
+        [boolean]$InstallGit
+        [string]$GitUserName
+        [string]$GitEmail
+        [boolean]$InstallVscode
+        [string[]]$AdditionalVsCodeExtensions
+        [string[]]$PsModules
+        [boolean]$IncludeTests
 }
 
 #Set aliases

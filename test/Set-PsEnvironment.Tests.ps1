@@ -26,7 +26,26 @@ Describe 'Create environment config file tests' {
         It "Git username should be set" {
             $config.GitUsername | Should be "Your Name"
         }
-    }
 
+        It "Git email should be set" {
+            $config.GitEmail | Should be "your@email.com"
+        }
+
+        It "Install Vscode should be set to true" {
+            $config.InstallVscode | Should be 'true'
+        }
+
+        It "Additional vscode extensions should be 1" {
+            $config.AdditionalVsCodeExtensions.count | Should be 1
+        }
+
+        It "PsModules should be 2" {
+            $config.PsModules.count | Should be 2
+        }
+
+        It "Includetests should be set to true" {
+            $config.Includetests | Should be 'true'
+        }
+    }
 }
 
