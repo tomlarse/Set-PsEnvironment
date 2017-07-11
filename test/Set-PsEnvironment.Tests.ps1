@@ -10,42 +10,34 @@ Describe 'Module Manifest Tests' {
 }
 
 Describe 'Create environment config file tests' {
-    New-PsEnvironmentConfig -OutputFilePath "$env:TEMP\config.json" -InstallGit -GitUserName "Your Name" -GitEmail "your@email.com" -InstallVscode -AdditionalVsCodeExtensions 'eamodio.gitlens' -PsModules 'pester','plaster' -PsProfile c:\path\to\source\profile.ps1 -IncludeTests
+    $config = New-PsEnvironmentConfig -InstallGit -GitUserName "Your Name" -GitEmail "your@email.com" -InstallVscode -AdditionalVsCodeExtensions 'eamodio.gitlens' -PsModules 'pester','plaster' -PsProfile $profile -IncludeTests
 
-    It 'Creates a config file' {
-        Test-Path "$env:TEMP\config.json" | Should Be $true
+    It "Git should be set to true" {
+        $config.InstallGit | Should be 'true'
     }
 
-    if (Test-Path "$env:TEMP\config.json") {
-        $config = Get-Content "$env:TEMP\config.json" | ConvertTo-Json
+    It "Git username should be set" {
+        $config.GitUsername | Should be "Your Name"
+    }
 
-        It "Git should be set to true" {
-            $config.InstallGit | Should be 'true'
-        }
+    It "Git email should be set" {
+        $config.GitEmail | Should be "your@email.com"
+    }
 
-        It "Git username should be set" {
-            $config.GitUsername | Should be "Your Name"
-        }
+    It "Install Vscode should be set to true" {
+        $config.InstallVscode | Should be 'true'
+    }
 
-        It "Git email should be set" {
-            $config.GitEmail | Should be "your@email.com"
-        }
+    It "Additional vscode extensions should be 1" {
+        $config.AdditionalVsCodeExtensions.count | Should be 1
+    }
 
-        It "Install Vscode should be set to true" {
-            $config.InstallVscode | Should be 'true'
-        }
+    It "PsModules should be 2" {
+        $config.PsModules.count | Should be 2
+    }
 
-        It "Additional vscode extensions should be 1" {
-            $config.AdditionalVsCodeExtensions.count | Should be 1
-        }
-
-        It "PsModules should be 2" {
-            $config.PsModules.count | Should be 2
-        }
-
-        It "Includetests should be set to true" {
-            $config.Includetests | Should be 'true'
-        }
+    It "Includetests should be set to true" {
+        $config.Includetests | Should be 'true'
     }
 }
 

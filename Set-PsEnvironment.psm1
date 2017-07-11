@@ -93,6 +93,7 @@ function Set-PsEnvironment {
     }
 
     process {
+        $Config
     }
 
     end {
