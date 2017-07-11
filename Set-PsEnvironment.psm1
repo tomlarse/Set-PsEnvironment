@@ -65,23 +65,23 @@ function Set-PsEnvironment {
     [CmdletBinding(DefaultParameterSetName="Manual")]
     Param (
         [parameter(ParameterSetName="Config",Mandatory=$true)]
-        [string]ConfigFile,
+        [string]$ConfigFile,
         [parameter(ParameterSetName="Manual",Mandatory=$true)]
-        [string]PsProfile,
+        [string]$PsProfile,
         [parameter(ParameterSetName="Manual",Mandatory=$false)]
-        [switch]InstallGit,
+        [switch]$InstallGit,
         [parameter(ParameterSetName="Manual",Mandatory=$false)]
-        [string]GitUserName,
+        [string]$GitUserName,
         [parameter(ParameterSetName="Manual",Mandatory=$false)]
-        [string]GitEmail,
+        [string]$GitEmail,
         [parameter(ParameterSetName="Manual",Mandatory=$false)]
-        [switch]InstallVscode,
+        [switch]$InstallVscode,
         [parameter(ParameterSetName="Manual",Mandatory=$false)]
-        [string[]]AdditionalVsCodeExtensions,
+        [string[]]$AdditionalVsCodeExtensions,
         [parameter(ParameterSetName="Manual",Mandatory=$false)]
-        [string[]]PsModules,
+        [string[]]$PsModules,
         [parameter(ParameterSetName="Manual",Mandatory=$false)]
-        [switch]IncludeTests
+        [switch]$IncludeTests
     )
 
     begin {
@@ -144,23 +144,23 @@ function New-PsEnvironmentConfig {
     [CmdletBinding()]
     Param (
         [parameter(Mandatory=$true)]
-        [string]OutputFilePath,
+        [string]$OutputFilePath,
         [parameter(Mandatory=$true)]
-        [string]PsProfile,
+        [string]$PsProfile,
         [parameter(Mandatory=$false)]
-        [switch]InstallGit,
+        [switch]$InstallGit,
         [parameter(Mandatory=$false)]
-        [string]GitUserName,
+        [string]$GitUserName,
         [parameter(Mandatory=$false)]
-        [string]GitEmail,
+        [string]$GitEmail,
         [parameter(Mandatory=$false)]
-        [switch]InstallVscode,
+        [switch]$InstallVscode,
         [parameter(Mandatory=$false)]
-        [string[]]AdditionalVsCodeExtensions,
+        [string[]]$AdditionalVsCodeExtensions,
         [parameter(Mandatory=$false)]
-        [string[]]PsModules,
+        [string[]]$PsModules,
         [parameter(Mandatory=$false)]
-        [switch]IncludeTests
+        [switch]$IncludeTests
     )
 
     begin {
