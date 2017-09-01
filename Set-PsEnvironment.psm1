@@ -61,8 +61,9 @@ function Set-PsEnvironment {
     Path to a file containing the PowerShell profile that should be configured with the module.
 
     .PARAMETER IncludeTests
-    If this is set, the resulting PowerShell profile will create a set of tests that will be run every time
-    the profile is loaded. This parameter will require that pester is an installed PowerShell module.
+    If this is set, the resulting PowerShell profile will include a function that runs a set of tests
+    that checks the PS Environment. To run these tests, it is required that pester is an installed
+    PowerShell module.
 
     .NOTES
     General notes
@@ -90,13 +91,121 @@ function Set-PsEnvironment {
     )
 
     begin {
+        if ($PsCmdlet.ParameterSetName -eq "Config") {
+            $PsProfile = $Config.PsProfile
+            $InstallGit = $Config.InstallGit
+            $GitUserName = $Config.GitUserName
+            $GitEmail = $Config.GitEmail
+            $InstallVscode = $Config.InstallVscode
+            $AdditionalVsCodeExtensions = $Config.AdditionalVsCodeExtensions
+            $PsModules = $Config.PsModules
+            $IncludeTests = $Config.IncludeTests
+        }
+
+        $tests = "
+        Describe `"Test machine Powershell environment setup`" {
+        "
     }
 
     process {
-        $Config
+
+        #Install and configure VSCode
+        If ($InstallVscode) {
+            Install-Script Install-VSCode -Scope CurrentUser
+            if ($AdditionalVsCodeExtensions -ne $null) {
+                Install-VSCode.ps1 -AdditionalExtensions $AdditionalVsCodeExtensions
+            } else {
+                Install-VSCode.ps1
+            }
+
+            $tests += "It `"has Vscode installed`" {
+                (Test-Path 'C:\Program Files (x86)\Microsoft VS Code') | Should be `$true
+            }
+
+            "
+        }
+
+        #Install and configure Git
+        if ($InstallGit) {
+            Install-Script Install-Git -Scope CurrentUser; Install-Git.ps1
+
+            #Install posh-git
+            Install-Module posh-git -Scope CurrentUser
+
+            #Reload system path
+            $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
+
+            #Set Git variables
+            git config --global user.name $GitUserName
+            git config --global user.email $GitEmail
+            git config --global push.default "simple"
+
+            $tests += "It `"has git installed`" {
+                (git --version) -match `"git version`" | Should Be `$true
+            }
+
+            It `"has git user.name set`" {
+                (git config --get user.name) -ne `$null | Should be `$true
+            }
+
+            It `"has git user.email set`" {
+                (git config --get user.email) -ne `$null | Should be `$true
+            }
+
+            It `"has git push.default simple set`" {
+                (git config --get push.default) -eq `"simple`" | Should be `$true
+            }
+
+            It `"has posh-git installed`" {
+                ## Use -ListAvailable because the module might not be loaded yet.
+                (Get-Module -ListAvailable posh-git).Name -eq `"posh-git`" | Should Be `$true
+            }
+
+            "
+        }
+
+        #Install PS Modules
+        foreach ($module in $PsModules) {
+            Install-Module $module -Scope CurrentUser
+
+            $tests += "It `"has $module installed`" {
+                ## Use -ListAvailable because the module might not be loaded yet.
+                (Get-Module -ListAvailable $module).Name -eq `"$module`" | Should Be `$true
+            }
+
+            "
+        }
+
+        $tests += "}
+        "
+
     }
 
     end {
+        if ($IncludeTests) {
+            $profiletestpath = (join-path -path (split-path $profile) -childpath test)
+            If(!(test-path $profiletestpath))
+            {
+                New-Item -ItemType Directory -Force -Path $profiletestpath
+            }
+
+            Set-Content -Path (join-path -path $profiletestpath -childpath profile.tests.ps1) -Value $tests
+
+            $PsProfile += "
+            function Test-PsEnvironment {
+                Invoke-Pester -Path (Join-Path -Path (Split-Path `$profile) -Childpath test)
+            }
+            "
+        }
+
+        $profilepath = split-path $profile
+        If(!(test-path $profilepath))
+        {
+            New-Item -ItemType Directory -Force -Path $profilepath
+        }
+
+        Set-Content -Path $profile -Value $PsProfile
+
     }
 }
 
@@ -145,8 +254,9 @@ function New-PsEnvironmentConfig {
     Path to a file containing the PowerShell profile that should be configured with the module.
 
     .PARAMETER IncludeTests
-    If this is set, the resulting PowerShell profile will create a set of tests that will be run every time
-    the profile is loaded. This parameter will require that pester is an installed PowerShell module.
+    If this is set, the resulting PowerShell profile will include a function that runs a set of tests
+    that checks the PS Environment. To run these tests, it is required that pester is an installed
+    PowerShell module.
 
     #>
     [CmdletBinding()]
@@ -178,7 +288,7 @@ function New-PsEnvironmentConfig {
         $config.GitEmail = $GitEmail
         $config.GitUserName = $GitUserName
         $config.PsModules = $PsModules
-        $config.PsProfile = Get-Content -Path $PsProfile
+        $config.PsProfile = Get-Content -Path $PsProfile -Raw
 
         If ($InstallGit) {
             $config.InstallGit = $true
