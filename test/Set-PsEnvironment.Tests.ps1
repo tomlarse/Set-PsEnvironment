@@ -41,3 +41,10 @@ Describe 'Create environment config file tests' {
     }
 }
 
+Describe "Configure environment tests" {
+    $config = New-PsEnvironmentConfig -InstallGit -GitUserName "Your Name" -GitEmail "your@email.com" -InstallVscode -AdditionalVsCodeExtensions 'eamodio.gitlens' -PsModules 'pester','plaster' -PsProfile $profile -IncludeTests
+
+    Mock Install-Git.ps1 {}
+    Mock Install-VSCode.ps1 {} -ParameterFilter {$AdditionalExtensions -eq $config.AdditionalVsCodeExtensions}
+    mock git {}
+}
