@@ -1,0 +1,39 @@
+version: 1.0.{build}
+build_script:
+- ps: .build\build.ps1
+notifications:
+- provider: Webhook
+  url: https://outlook.office.com/webhook/824f0d76-73cd-439a-848e-ccb5e5b7d1b6@50e4f0f4-12cf-4169-94f9-7822831c8146/IncomingWebhook/76f2beb57fa848dd8bd64fb505512eaa/26aa8355-3f23-49a1-94f5-28a7b3c2ef64
+  method: POST
+  body: >-
+    {
+        "title": "AppVeyor Build {{#passed}}passed{{/passed}}{{#failed}}failed{{/failed}}",
+        "summary": "Build {{projectName}} {{buildVersion}} {{status}}",
+        "themeColor": "{{#passed}}00FF00{{/passed}}{{#failed}}FF0000{{/failed}}",
+        "sections": [
+            {
+                "activityTitle": "{{commitAuthor}} on {{commitDate}} ( {{repositoryProvider}}/{{repositoryName}} )",
+                "activityText": "[Build {{projectName}} {{buildVersion}} {{status}}]({{buildUrl}})"
+            },
+            {
+                "title": "Details",
+                "facts": [
+                    {
+                        "name": "Commit",
+                        "value": "[{{commitId}} by {{commitAuthor}} on {{branch}} at {{commitDate}}]({{commitUrl}})"
+                    },
+                    {
+                        "name": "Message",
+                        "value": "{{commitMessage}}"
+                    },
+                    {
+                        "name": "Duration",
+                        "value": "{{duration}} ({{started}} - {{finished}})"
+                    }
+                ]
+            }
+        ]
+    }
+  on_build_success: true
+  on_build_failure: true
+  on_build_status_changed: true
