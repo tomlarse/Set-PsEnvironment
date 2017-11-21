@@ -1,7 +1,4 @@
 # Taken from https://github.com/PowerShell/Demo_CI
-Install-Module psake -Scope CurrentUser -Force
-Import-Module psake
-
 function Invoke-TestFailure
 {
     param(
