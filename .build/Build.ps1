@@ -1,8 +1,5 @@
 # Taken from https://github.com/PowerShell/Demo_CI
-Register-PSRepository -Default
-Install-PackageProvider -Name NuGet -Force -Scope CurrentUser
-
-Install-Module psake -Scope CurrentUser
+Install-Module psake -Scope CurrentUser -Force
 Import-Module psake
 
 function Invoke-TestFailure
