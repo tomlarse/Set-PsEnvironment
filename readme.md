@@ -1,4 +1,5 @@
 # Automatic setup of Powershell environment
+# Jeg prøver....
 
 [![Build status](https://ci.appveyor.com/api/projects/status/scbri4ekyp031f00?svg=true)](https://ci.appveyor.com/project/tomlarse/set-psenvironment)
 ## Set-PsEnvironment
