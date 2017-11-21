@@ -23,12 +23,12 @@ function Invoke-TestFailure
 FormatTaskName "--------------- {0} ---------------"
 
 Properties {
-    $TestsPath = "$PSScriptRoot\Test"
+    $TestsPath = "$PSScriptRoot\..\Test"
     $TestResultsPath = "$TestsPath\Results"
     $ArtifactPath = "$Env:BUILD_ARTIFACTSTAGINGDIRECTORY"
     $ModuleArtifactPath = "$ArtifactPath\Modules"
     $MOFArtifactPath = "$ArtifactPath\MOF"
-    $ConfigPath = "$PSScriptRoot"
+    $ConfigPath = "$PSScriptRoot\.."
     $RequiredModules = @(@{Name = 'xDnsServer'; Version = '1.7.0.0'}, @{Name = 'xNetworking'; Version = '2.9.0.0'})
 }
 
