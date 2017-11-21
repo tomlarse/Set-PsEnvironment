@@ -1,9 +1,10 @@
 Task default -Depends Test
 
 Task Test -Depends Init, Clean {
-    $profile = "$($ENV:BHProjectPath)\profile.ps1"
+    $global:profile = "$($ENV:BHProjectPath)\profile.ps1"
     New-Item -ItemType File -Path $profile
     Set-Content -Path $profile -Value "profile"
+
     $testresultsfile = ".\Testresults.xml"
     $res = Invoke-Pester ..\ -OutputFormat NUnitXml -OutputFile $testresultsfile -PassThru
 
