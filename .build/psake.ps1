@@ -4,7 +4,7 @@ Task Test -Depends Init, Clean {
     $profile = "$($ENV:BHProjectPath)\profile.ps1"
     New-Item -ItemType File -Path $profile
     Set-Content -Path $profile -Value "profile"
-    $testresultsfile = .\Testresults.xml
+    $testresultsfile = ".\Testresults.xml"
     $res = Invoke-Pester ..\ -OutputFormat NUnitXml -OutputFile $testresultsfile -PassThru
 
     (New-Object 'System.Net.WebClient').UploadFile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path $testResultsFile))
