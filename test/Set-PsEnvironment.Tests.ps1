@@ -2,18 +2,6 @@ $ModuleManifestName = 'Set-PsEnvironment.psd1'
 $ModuleManifestPath = "$PSScriptRoot\..\$ModuleManifestName"
 Import-Module "$PSScriptRoot\..\Set-PsEnvironment.psd1"
 
-#Get current git config, Set-PsEnvironment will change user.name and user.email, need to revert after test has run.
-#Can't find a way to mock it.
-$gitc = git config --list | Sort-Object -Unique
-$gitconfig = @{}
-
-#Convert to hashtable, git config is on the format item.config=Item value
-foreach ($item in $gitc) {
-    $hashitem = $item -split '='
-    $gitconfig.Add($hashitem[0], $hashitem[1])
-}
-
-
 Describe 'Module Manifest Tests' {
     It 'Passes Test-ModuleManifest' {
         Test-ModuleManifest -Path $ModuleManifestPath
@@ -91,9 +79,4 @@ Describe "Configure environment tests -- All params configured" {
     It "Adds Profile content" {
         Assert-MockCalled Set-Content -ParameterFilter {$path -and $path -eq $profile } -Exactly 1 -ModuleName Set-PsEnvironment
     }
-
 }
-
-#Clean up git config
-git config --global user.name $gitconfig.'user.name'
-git config --global user.email $gitconfig.'user.email'
