@@ -9,5 +9,5 @@ Task Clean -Depends Init {
 }
 
 Task Init {
-    "init"
+    $profile = "$($ENV:BHProjectPath)\profile.ps1"
 }

@@ -7,6 +7,4 @@ Import-Module Psake, Pester
 
 Invoke-psake .build\psake.ps1
 
-$profile = "$($ENV:BHProjectPath)\profile.ps1"
-
 exit ( [int]( -not $psake.build_success ) )
