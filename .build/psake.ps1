@@ -1,3 +1,5 @@
+Task default -Depends Test
+
 Task Test -Depends Init, Clean {
     Invoke-Pester
 }
