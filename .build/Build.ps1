@@ -1,8 +1,8 @@
 # Taken from https://github.com/PowerShell/Demo_CI
-Register-PSRepository -Name PSGallery -SourceLocation https://www.powershellgallery.com/api/v2/ -InstallationPolicy Trusted -PackageManagementProvider NuGet
-Install-PackageProvider -Name NuGet -Force
+Register-PSRepository -Default
+Install-PackageProvider -Name NuGet -Force -Scope CurrentUser
 
-Install-Module psake
+Install-Module psake -Scope CurrentUser
 Import-Module psake
 
 function Invoke-TestFailure
@@ -49,20 +49,11 @@ Task InstallModules -depends Clean {
     # Install resources on build agent
     "Installing required resources..."
 
-    #Workaround for bug in Install-Module cmdlet
-    if (!(Get-PackageProvider -Name NuGet -ListAvailable -ErrorAction Ignore)) {
-        Install-PackageProvider -Name NuGet -Force
-    }
-
-    if (!(Get-PSRepository -Name PSGallery -ErrorAction Ignore)) {
-        Register-PSRepository -Name PSGallery -SourceLocation https://www.powershellgallery.com/api/v2/ -InstallationPolicy Trusted -PackageManagementProvider NuGet
-    }
-
     #End Workaround
 
     foreach ($Resource in $RequiredModules) {
-        Install-Module -Name $Resource.Name -RequiredVersion $Resource.Version -Repository 'PSGallery' -Force
-        Save-Module -Name $Resource.Name -RequiredVersion $Resource.Version -Repository 'PSGallery' -Path $ModuleArtifactPath -Force
+        Install-Module -Name $Resource.Name -RequiredVersion $Resource.Version -Scope CurrentUser
+        Save-Module -Name $Resource.Name -RequiredVersion $Resource.Version -Path $ModuleArtifactPath -Force
     }
 }
 
