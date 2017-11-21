@@ -10,7 +10,7 @@ Describe 'Module Manifest Tests' {
 }
 
 Describe 'Create environment config file tests' {
-    $config = New-PsEnvironmentConfig -InstallGit -GitUserName "Your Name" -GitEmail "your@email.com" -InstallVscode -AdditionalVsCodeExtensions 'eamodio.gitlens' -PsModules 'pester','plaster' -PsProfile $profile -IncludeTests
+    $config = New-PsEnvironmentConfig -InstallGit -GitUserName "Your Name" -GitEmail "your@email.com" -InstallVscode -AdditionalVsCodeExtensions 'eamodio.gitlens' -PsModules 'pester','plaster' -PsProfile " " -IncludeTests
 
     It "Git should be set to true" {
         $config.InstallGit | Should be 'true'
@@ -42,7 +42,7 @@ Describe 'Create environment config file tests' {
 }
 
 Describe "Configure environment tests -- All params configured" {
-    $config = New-PsEnvironmentConfig -InstallGit -GitUserName "Your Name" -GitEmail "your@email.com" -InstallVscode -AdditionalVsCodeExtensions 'eamodio.gitlens' -PsModules 'pester', 'plaster' -PsProfile $profile -IncludeTests
+    $config = New-PsEnvironmentConfig -InstallGit -GitUserName "Your Name" -GitEmail "your@email.com" -InstallVscode -AdditionalVsCodeExtensions 'eamodio.gitlens' -PsModules 'pester', 'plaster' -PsProfile " " -IncludeTests
     #Get current git config, Set-PsEnvironment will change user.name and user.email, need to revert after test has run.
     #Can't find a way to mock it.
     $gitc = git config --list | Sort-Object -Unique
