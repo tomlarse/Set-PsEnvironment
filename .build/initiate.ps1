@@ -1,0 +1,1 @@
+Invoke-PSake $PSScriptRoot\.build\Build.ps1
