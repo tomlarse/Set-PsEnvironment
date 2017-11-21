@@ -1,4 +1,8 @@
 # Taken from https://github.com/PowerShell/Demo_CI
+Register-PSRepository -Name PSGallery -SourceLocation https://www.powershellgallery.com/api/v2/ -InstallationPolicy Trusted -PackageManagementProvider NuGet
+Install-PackageProvider -Name NuGet -Force
+
+Install-Module psake
 Import-Module psake
 
 function Invoke-TestFailure
@@ -31,7 +35,7 @@ Properties {
     $ModuleArtifactPath = "$ArtifactPath\Modules"
     $MOFArtifactPath = "$ArtifactPath\MOF"
     $ConfigPath = "$PSScriptRoot"
-    $RequiredModules = @(@{Name='xDnsServer';Version='1.7.0.0'}, @{Name='xNetworking';Version='2.9.0.0'})
+    $RequiredModules = @(@{Name = 'xDnsServer'; Version = '1.7.0.0'}, @{Name = 'xNetworking'; Version = '2.9.0.0'})
 }
 
 Task Default -depends UnitTests
@@ -46,20 +50,17 @@ Task InstallModules -depends Clean {
     "Installing required resources..."
 
     #Workaround for bug in Install-Module cmdlet
-    if(!(Get-PackageProvider -Name NuGet -ListAvailable -ErrorAction Ignore))
-    {
+    if (!(Get-PackageProvider -Name NuGet -ListAvailable -ErrorAction Ignore)) {
         Install-PackageProvider -Name NuGet -Force
     }
 
-    if (!(Get-PSRepository -Name PSGallery -ErrorAction Ignore))
-    {
+    if (!(Get-PSRepository -Name PSGallery -ErrorAction Ignore)) {
         Register-PSRepository -Name PSGallery -SourceLocation https://www.powershellgallery.com/api/v2/ -InstallationPolicy Trusted -PackageManagementProvider NuGet
     }
 
     #End Workaround
 
-    foreach ($Resource in $RequiredModules)
-    {
+    foreach ($Resource in $RequiredModules) {
         Install-Module -Name $Resource.Name -RequiredVersion $Resource.Version -Repository 'PSGallery' -Force
         Save-Module -Name $Resource.Name -RequiredVersion $Resource.Version -Repository 'PSGallery' -Path $ModuleArtifactPath -Force
     }
