@@ -1,4 +1,5 @@
 Install-Module psake -Scope CurrentUser -Force
-Import-Module psake
+Install-Module PSScriptAnalyzer -Scope CurrentUser -Force
+Import-Module psake, PSScriptAnalyzer
 
 Invoke-PSake $PSScriptRoot\Build.ps1
